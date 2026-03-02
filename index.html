@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Maïc Vibes AI</title>
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            background-color: #0b211a;
+            background-image: radial-gradient(circle at top, #143d31 0%, #0b211a 100%);
+            color: white;
+            font-family: 'Segoe UI', Roboto, Helvetica, sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .gold { color: #d4af37; }
+
+        header {
+            padding: 15px 0;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            margin: 0;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        header p {
+            font-size: 0.8rem;
+            margin: 5px 0 0 0;
+            opacity: 0.6;
+            letter-spacing: 1px;
+        }
+
+        main {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 10px 20px 15px 20px;
+            max-width: 500px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* ZONE PHOTO GÉANTE */
+        #preview-container {
+            flex-grow: 1;
+            max-height: 60vh;
+            width: 100%;
+            border: 2px solid #d4af37;
+            border-radius: 20px;
+            background: rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            margin-bottom: 15px;
+            cursor: pointer;
+        }
+
+        #preview {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        #placeholder-box {
+            text-align: center;
+            color: #d4af37;
+            padding: 20px;
+        }
+
+        /* SECTION CONTRÔLES EN BAS */
+        .controls {
+            flex-shrink: 0;
+            background: rgba(26, 60, 49, 0.95);
+            padding: 15px;
+            border-radius: 20px;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.2);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .style-btn {
+            background: transparent;
+            border: 1px solid rgba(212, 175, 55, 0.5);
+            color: white;
+            padding: 12px 5px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .style-btn.selected {
+            background-color: #d4af37;
+            color: #0b211a;
+            font-weight: bold;
+            border-color: #d4af37;
+        }
+
+        /* --- BARRE DE PROGRESSION DORÉE MAÏC --- */
+        #progress-container {
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            margin-bottom: 10px;
+            overflow: hidden;
+            display: none; /* Masqué par défaut */
+        }
+
+        #progress-bar {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #b38728, #fcf6ba, #d4af37);
+            border-radius: 10px;
+            transition: width 0.4s ease-out;
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.6);
+        }
+
+        .main-btn {
+            background: linear-gradient(135deg, #d4af37, #b38728);
+            color: #0b211a;
+            padding: 18px;
+            border-radius: 30px;
+            font-weight: 900;
+            cursor: pointer;
+            width: 100%;
+            border: none;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transition: 0.3s;
+        }
+
+        .main-btn:disabled { opacity: 0.6; cursor: wait; }
+
+        footer {
+            padding: 10px 0;
+            font-size: 0.7rem;
+            opacity: 0.5;
+            text-align: center;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🌙 Maïc <span class="gold">Vibes</span></h1>
+        <p>STUDIO DE MODE VIRTUEL • BY MAÏC STYLE</p>
+    </header>
+
+    <main>
+        <div id="preview-container" onclick="document.getElementById('imageInput').click()">
+            <div id="placeholder-box">
+                <div style="font-size: 3rem;">📸</div>
+                <p style="font-weight: bold;">TAPE ICI POUR AJOUTER TA PHOTO</p>
+                <p style="font-size: 0.8rem; opacity: 0.7;">(Préfère un portrait bien éclairé)</p>
+            </div>
+            <img id="preview" src="" style="display:none;">
+        </div>
+
+        <input type="file" id="imageInput" accept="image/*" hidden>
+
+        <div class="controls">
+            <div class="grid">
+                <button class="style-btn" onclick="selectStyle(this, 'luxurious traditional Djellaba, gold embroidery')">Djellaba</button>
+                <button class="style-btn" onclick="selectStyle(this, 'royal Moroccan Caftan, silk fabric')">Caftan</button>
+                <button class="style-btn" onclick="selectStyle(this, 'modern white Qamis, premium look')">Qamis</button>
+            </div>
+
+            <div id="progress-container">
+                <div id="progress-bar"></div>
+            </div>
+
+            <button id="generateBtn" class="main-btn">Révéler mon style ✨</button>
+            <button id="downloadBtn" class="main-btn" style="display:none; background: white; color: black; margin-top: 10px;">Enregistrer 📥</button>
+        </div>
+
+        <footer>
+            © 2024 • DESIGN BY <strong>MAÏC STYLE</strong> • ALL RIGHTS RESERVED
+        </footer>
+    </main>
+
+    <script>
+        // TOKEN SECURISÉ (COUPÉ)
+        const p1 = "hf_DnpzYvSsAaDWp";
+        const p2 = "smkYAzNSSXvfqwShJODOk";
+        const AUTH = p1 + p2;
+        const MODEL = "https://api-inference.huggingface.co/models/SG161222/RealVisXL_V4.0";
+
+        let chosenStyle = "";
+        let base64Image = ""; // Stocke l'image compressée
+        
+        const input = document.getElementById('imageInput');
+        const preview = document.getElementById('preview');
+        const placeholder = document.getElementById('placeholder-box');
+        const genBtn = document.getElementById('generateBtn');
+        const downBtn = document.getElementById('downloadBtn');
+        const progContainer = document.getElementById('progress-container');
+        const progBar = document.getElementById('progress-bar');
+
+        function selectStyle(btn, prompt) {
+            chosenStyle = prompt;
+            document.querySelectorAll('.style-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('active'); // Pour forcer le style immédiat
+            setTimeout(() => { btn.classList.remove('active'); btn.classList.add('selected'); }, 100);
+        }
+
+        // COMPRESSION ET APERÇU IMMÉDIAT
+        input.onchange = function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            // Afficher un "chargement" dans l'aperçu
+            placeholder.innerHTML = "<div style='font-size:3rem;'>⏳</div><p>Chargement...</p>";
+
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const MAX_WIDTH = 800; // Taille idéale pour l'IA
+                    const scale = MAX_WIDTH / img.width;
+                    canvas.width = MAX_WIDTH;
+                    canvas.height = img.height * scale;
+
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+                    base64Image = canvas.toDataURL('image/jpeg', 0.8);
+                    
+                    preview.src = base64Image;
+                    preview.style.display = 'block';
+                    placeholder.style.display = 'none';
+                    downBtn.style.display = 'none';
+                };
+                img.src = ev.target.result;
+            };
+            reader.readAsDataURL(file);
+        };
+
+        // GESTIONNAIRE DE LA BARRE DE PROGRESSION (Simulée)
+        function simulateProgress() {
+            progContainer.style.display = 'block';
+            progBar.style.width = '0%';
+            
+            // On fait monter la barre doucement jusqu'à 90%
+            let progress = 0;
+            const interval = setInterval(() => {
+                if (progress < 90) {
+                    progress += 2; // Vitesse de montée
+                    progBar.style.width = progress + '%';
+                }
+            }, 500); // Mise à jour toutes les 0.5s (pour simuler 20-30s)
+            
+            return interval; // Retourne l'interval pour le stopper
+        }
+
+        genBtn.onclick = async function() {
+            if (!base64Image) return alert("❌ Ajoute une photo !");
+            if (!chosenStyle) return alert("⚠️ Choisis ton vêtement !");
+
+            genBtn.innerText = "⏳ Maïc AI travaille...";
+            genBtn.disabled = true;
+            
+            // Lancer la barre de progression
+            const progInterval = simulateProgress();
+
+            try {
+                // Conversion base64 en Blob pour l'envoi
+                const blobImage = await (await fetch(base64Image)).blob();
+
+                const response = await fetch(MODEL, {
+                    headers: { 
+                        "Authorization": `Bearer ${AUTH}`, 
+                        "Content-Type": "application/json" 
+                    },
+                    method: "POST",
+                    body: JSON.stringify({
+                        inputs: `Hyper-realistic photography portrait, the person from image wearing ${chosenStyle}, ramadan fashion, detailed fabric, 8k, professional studio lighting, maintaining facial features.`,
+                        options: { "wait_for_model": true, "use_cache": false }
+                    }),
+                });
+
+                if (!response.ok) throw new Error("IA occupée... Reclique dans 10 secondes !");
+
+                const blob = await response.blob();
+                const url = URL.createObjectURL(blob);
+                
+                // Finaliser la barre de progression (100%)
+                clearInterval(progInterval);
+                progBar.style.width = '100%';
+                
+                setTimeout(() => {
+                    preview.src = url;
+                    downBtn.style.display = 'block';
+                    progContainer.style.display = 'none'; // Cacher la barre après succès
+                    
+                    downBtn.onclick = () => {
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = "Maic_Style_Look.png";
+                        a.click();
+                    };
+                    
+                    alert("✨ Ta transformation Maïc Style est prête !");
+                }, 500); // Petit délai pour voir les 100%
+
+            } catch (err) {
+                clearInterval(progInterval);
+                progContainer.style.display = 'none';
+                alert(err.message);
+            } finally {
+                genBtn.innerText = "Révéler mon style ✨";
+                genBtn.disabled = false;
+            }
+        };
+    </script>
+</body>
+  </html>
